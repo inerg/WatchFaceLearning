@@ -2,29 +2,35 @@
 
 static Window *s_main_window;
 static TextLayer *s_time_layer;
+static TextLayer  *s_date_layer;
 static GFont s_time_font;
 static BitmapLayer  *s_background_layer;
 static GBitmap  *s_background_bitmap;
+
 
 static void update_time()  {
   //Gets the tm structure(still trying to figure out what tm is)
   time_t temp = time(NULL);
   struct tm *tick_time = localtime(&temp);
   
-  //Create a buffer
-  static char buffer[] = "00:00";
+  //Create a buffer for time
+  static char time_buffer[] = "00:00";
+  
+  //Create a buffer for the date
+  static char date_buffer[] = "jan 01";
   
   //Insert the current hour and minutes into the buffer
   if(clock_is_24h_style()==true)  {
     //Use 24 hour format
-    strftime(buffer, sizeof("00:00"), "%H:%M", tick_time);
+    strftime(time_buffer, sizeof("00:00"), "%H:%M", tick_time);
   }  else {
     //Use 12 hour format
-    strftime(buffer, sizeof("00:00"), "%I:%M", tick_time);
+    strftime(time_buffer, sizeof("00:00"), "%I:%M", tick_time);
   }
+  strftime(date_buffer, sizeof"jan 01", "%h %d", tick_time);
   
   //Put this time into the text layer
-  text_layer_set_text(s_time_layer, buffer);
+  text_layer_set_text(s_time_layer, time_buffer);
 }
 
 static void main_window_load(Window *window)  {
