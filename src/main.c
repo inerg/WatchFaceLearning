@@ -6,13 +6,8 @@ static TextLayer  *s_date_layer;
 static GFont s_time_font;
 static BitmapLayer  *s_background_layer;
 static GBitmap  *s_background_bitmap;
-static boolean s_launched;
-
-
 
 static void main_window_load(Window *window)  {
-  //Sets s_launched to true so that the date position will be set correctly
-  s_launched = true;
   //Create Gbitmap and then set it as the base BitmapLayer for the window
   s_background_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BACKGROUND);
   s_background_layer = bitmap_layer_create(GRect(0, 0, 144, 168));
@@ -112,7 +107,6 @@ static void update_time()  {
   }
   strftime(date_buffer, sizeof"jan01", "%h%d", tick_time);
   
-  int seconds = tick_time->tm_sec;
   int minutes = tick_time->tm_min;
   int hours = tick_time->tm_hour;
   //Checks the date position to ensure its placed correctly
@@ -132,8 +126,7 @@ static void update_time()  {
       GRect end = GRect(144, 0, 139, 50);
       animate_layer(text_layer_get_layer(s_date_layer), &start, &end, 1000, 58000);
     }
-  }
-  if(minutes == 0) {
+  } else if(minutes == 0) {
     if((hours % 2) == 1) {
       //Slides on to the left at the bottom starting from the right
       GRect start = GRect(288, 110, 139, 50);
@@ -148,24 +141,7 @@ static void update_time()  {
     }
   }
   
-  //Checks if its the first start of the app and properly places the date.
-  if(s_launcehd) { 
-    if((hours % 2) == 1) {
-        //Slides on to the left at the bottom starting from the right
-        GRect start = GRect(288, 110, 139, 50);
-        GRect end = GRect(5, 110, 139, 50);
-        animate_layer(text_layer_get_layer(s_date_layer), &start, &end, 1000, 0);
-        s_launched = false;
-      }
-      else {
-        //Slides on to the right starting from left
-        GRect start = GRect(-144, 0, 139, 50);
-        GRect end = GRect(5, 0, 139, 50);
-        animate_layer(text_layer_get_layer(s_date_layer), &start, &end, 1000, 0);
-        s_launched = false;
-      }
-  }
-  
+
   //Put this time into the text layer
   text_layer_set_text(s_time_layer, time_buffer);
   text_layer_set_text(s_date_layer, date_buffer);
@@ -173,6 +149,47 @@ static void update_time()  {
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed)  {
   update_time();
+}
+
+//Used only for startup to ensure the date is placed properly
+static void start_update_time() {
+  time_t temp = time(NULL);
+  struct tm *tick_time = localtime(&temp);
+  
+  //Create a buffer for time
+  static char time_buffer[] = "00:00";
+  
+  //Create a buffer for the date
+  static char date_buffer[] = "jan01";
+  
+  //Insert the current hour and minutes into the buffer
+  if(clock_is_24h_style()==true)  {
+    //Use 24 hour format
+    strftime(time_buffer, sizeof("00:00"), "%H:%M", tick_time);
+  }  else {
+    //Use 12 hour format
+    strftime(time_buffer, sizeof("00:00"), "%I:%M", tick_time);
+  }
+  strftime(date_buffer, sizeof"jan01", "%h%d", tick_time);
+  
+  int hours = tick_time->tm_hour;
+  
+  if((hours % 2) == 1) {
+    //Slides on to the left at the bottom starting from the right
+    GRect start = GRect(288, 110, 139, 50);
+    GRect end = GRect(5, 110, 139, 50);
+    animate_layer(text_layer_get_layer(s_date_layer), &start, &end, 1000, 0);
+  }
+  else {
+    //Slides on to the right starting from left
+    GRect start = GRect(-144, 0, 139, 50);
+    GRect end = GRect(5, 0, 139, 50);
+    animate_layer(text_layer_get_layer(s_date_layer), &start, &end, 1000, 0);
+  }
+  
+  //Put this time into the text layer
+  text_layer_set_text(s_time_layer, time_buffer);
+  text_layer_set_text(s_date_layer, date_buffer);
 }
 
 static void init()  {
@@ -188,8 +205,8 @@ static void init()  {
   //Shows the window with animations being enabled
   window_stack_push(s_main_window, true);
   
-  //Ensures the time is displayed correctly at start
-  update_time();
+  //Ensures the time is displayed correctly at start as well as date
+  start_update_time();
   
   //Registering the TickTimerService
   tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
