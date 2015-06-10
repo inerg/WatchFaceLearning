@@ -9,6 +9,11 @@
     "resources": {
         "media": [
             {
+                "file": "images/battery-empty.png",
+                "name": "BATTERY_0",
+                "type": "png"
+            },
+            {
                 "file": "images/battery-charged.png",
                 "name": "BATTERY_100",
                 "type": "png"
@@ -30,7 +35,7 @@
             },
             {
                 "file": "images/battery-20.png",
-                "name": "BATTER_20",
+                "name": "BATTERY_20",
                 "type": "png"
             },
             {

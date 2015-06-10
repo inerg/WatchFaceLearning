@@ -5,6 +5,8 @@ static TextLayer *s_time_layer;
 static TextLayer  *s_date_layer;
 static GFont s_time_font;
 static BitmapLayer  *s_background_layer;
+static BitmapLayer *s_battery_layer;
+static GBitmap *s_battery_bitmap; //Might need more of these for each image.
 static GBitmap  *s_background_bitmap;
 
 static void main_window_load(Window *window)  {
@@ -49,6 +51,12 @@ static void main_window_load(Window *window)  {
   
   //Sets the text layer as a child to the base window layer
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_date_layer));
+  
+  //BATTERY LAYER
+  s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_100);
+  s_battery_layer = bitmap_layer_create(GRect(4, 49, 139, 16));
+  bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
+  layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(s_battery_layer));
 }
 
 static void main_window_unload(Window *window)  {
@@ -62,6 +70,10 @@ static void main_window_unload(Window *window)  {
   gbitmap_destroy(s_background_bitmap);
   //Destroys bitmap layer (layer created for image)
   bitmap_layer_destroy(s_background_layer);
+  //Destroys bitmap for battery
+  gbitmap_destroy(s_battery_bitmap);
+  //Destroys bitmap layer for battery
+  bitmap_layer_destroy(s_battery_layer);
 }
 
 //Animation
@@ -77,7 +89,7 @@ void animate_layer(Layer *layer, GRect *start, GRect *finish, int duration, int 
   animation_set_duration((Animation*) anim, duration);
   animation_set_delay((Animation*) anim, delay);
   
-  //Does something to help free memory
+  //Prepares the clearing for when the animation finishes.
   AnimationHandlers handlers = {  
     .stopped = (AnimationStoppedHandler) on_animation_stopped};
   animation_set_handlers((Animation*) anim, handlers, NULL);
@@ -151,6 +163,34 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed)  {
   update_time();
 }
 
+static void update_battery()  {
+  BatteryChargeState battery_state = battery_state_service_peek();
+  if(battery_state.charge_percent > 90)  {
+    s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_100);
+    bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
+  } else if(battery_state.charge_percent > 80)  {
+    s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_80);
+    bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
+  } else if(battery_state.charge_percent > 60)  {
+    s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_60);
+    bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
+  } else if(battery_state.charge_percent > 40)  {
+    s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_40);
+    bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
+  } else if(battery_state.charge_percent > 20)  {
+    s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_20);
+    bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
+  } else if(battery_state.charge_percent < 20)  {
+    s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_0);
+    bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
+  }
+  
+}
+
+static void battery_handler(BatteryChargeState charge_state)  {
+  update_battery();
+}
+
 //Used only for startup to ensure the date is placed properly
 static void start_update_time() {
   time_t temp = time(NULL);
@@ -210,6 +250,10 @@ static void init()  {
   
   //Registering the TickTimerService
   tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
+  
+  update_battery();
+  //Registering the BatteryStateService
+  battery_state_service_subscribe(battery_handler);
 }
 
 static void deinit()  {
