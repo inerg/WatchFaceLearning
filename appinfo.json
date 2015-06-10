@@ -9,6 +9,31 @@
     "resources": {
         "media": [
             {
+                "file": "images/battery-charged.png",
+                "name": "BATTERY_100",
+                "type": "png"
+            },
+            {
+                "file": "images/battery-80.png",
+                "name": "BATTERY_80",
+                "type": "png"
+            },
+            {
+                "file": "images/battery-60.png",
+                "name": "BATTERY_60",
+                "type": "png"
+            },
+            {
+                "file": "images/battery-40.png",
+                "name": "BATTERY_40",
+                "type": "png"
+            },
+            {
+                "file": "images/battery-20.png",
+                "name": "BATTER_20",
+                "type": "png"
+            },
+            {
                 "file": "images/background.png",
                 "name": "IMAGE_BACKGROUND",
                 "type": "png"
