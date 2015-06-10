@@ -4,7 +4,7 @@
         ""
     ],
     "companyName": "Inerg",
-    "longName": "My First Watchface",
+    "longName": "Alternate",
     "projectType": "native",
     "resources": {
         "media": [
@@ -21,13 +21,13 @@
         ]
     },
     "sdkVersion": "3",
-    "shortName": "My First Watchface",
+    "shortName": "Alternate",
     "targetPlatforms": [
         "aplite",
         "basalt"
     ],
     "uuid": "704e9922-77c0-4cbb-9da2-d8127d004686",
-    "versionLabel": "1.0",
+    "versionLabel": "1.1",
     "watchapp": {
         "watchface": true
     }

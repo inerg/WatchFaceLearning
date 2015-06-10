@@ -9,10 +9,27 @@ static GBitmap  *s_background_bitmap;
 
 
 static void update_time()  {
-  //Gets the tm structure(still trying to figure out what tm is)
+  //Gets the tm structure
   time_t temp = time(NULL);
   struct tm *tick_time = localtime(&temp);
   
+  int seconds = tick_time->tm_sec;
+  int minutes = tick_time->tm_min;
+  int hours = tick_time->tm_hour;
+  
+  if(minutes == 59) {
+    //Sets the ticker to seconds for the last minute for the transition to happen at the last second
+      //tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
+    if(seconds == 59) {  
+      if((hours % 2) == 1) {
+        //Slides off to the left at the bottom
+        //GRect
+      }
+      else {
+        
+      }
+    }
+  }
   //Create a buffer for time
   static char time_buffer[] = "00:00";
   
@@ -63,7 +80,7 @@ static void main_window_load(Window *window)  {
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_time_layer));
   
   //DATE LAYER
-  s_date_layer = text_layer_create(GRect(5, 0, 139, 50));
+  s_date_layer = text_layer_create(GRect(5, 110, 139, 50));
   text_layer_set_background_color(s_date_layer, GColorClear);
   text_layer_set_text_color(s_date_layer, GColorWhite);
   text_layer_set_text(s_date_layer, "jan 01");
@@ -89,6 +106,28 @@ static void main_window_unload(Window *window)  {
   gbitmap_destroy(s_background_bitmap);
   //Destroys bitmap layer (layer created for image)
   bitmap_layer_destroy(s_background_layer);
+}
+
+//Animation
+void on_animation_stopped(Animation *anim, bool finished, void *context)  {
+  property_animation_destroy((PropertyAnimation*) anim);
+}
+
+void animate_layer(Layer *layer, GRect *start, GRect *finish, int duration, int delay)  {
+  //Declaring the animation
+  PropertyAnimation *anim = property_animation_create_layer_frame(layer, start, finish);
+  
+  //Filling the animations propertys
+  animation_set_duration((Animation*) anim, duration);
+  animation_set_delay((Animation*) anim, delay);
+  
+  //Does something to help free memory
+  AnimationHandlers handlers = {  
+    .stopped = (AnimationStoppedHandler) on_animation_stopped};
+  animation_set_handlers((Animation*) anim, handlers, NULL);
+  
+  //Start animation
+  animation_schedule((Animation*) anim);
 }
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed)  {
