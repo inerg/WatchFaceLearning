@@ -4,7 +4,6 @@ static Window *s_main_window;
 static TextLayer *s_time_layer;
 static TextLayer  *s_date_layer;
 static GFont s_time_font;
-static GFont s_date_font;
 static BitmapLayer  *s_background_layer;
 static GBitmap  *s_background_bitmap;
 
