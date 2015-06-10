@@ -38,7 +38,13 @@ static void main_window_load(Window *window)  {
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_time_layer));
   
   //DATE LAYER
-  s_date_layer = text_layer_create(GRect(5, 0, 139, 50));
+  //Prepping for position based on hour
+  int hours = tick_time->tm_hour;
+  if((hours % 2) == 1) {
+    s_date_layer = text_layer_create(GRect(5, 110, 139, 50));
+  } else {
+    s_date_layer = text_layer_create(GRect(5, 0, 139, 50));
+  }
   text_layer_set_background_color(s_date_layer, GColorClear);
   text_layer_set_text_color(s_date_layer, GColorWhite);
   text_layer_set_text(s_date_layer, "jan 01");
@@ -121,26 +127,27 @@ static void update_time()  {
       //Slides off to the left at the bottom
       GRect start = GRect(5, 110, 139, 50);
       GRect end = GRect(-149, 110, 139, 50);
-      animate_layer(text_layer_get_layer(s_date_layer), &start, &end, 1000, 300);
+      animate_layer(text_layer_get_layer(s_date_layer), &start, &end, 1000, 58000);
     }
     else {
       //Slides off to the right
       GRect start = GRect(5, 0, 139, 50);
       GRect end = GRect(144, 0, 139, 50);
-      animate_layer(text_layer_get_layer(s_date_layer), &start, &end, 1000, 300);
+      animate_layer(text_layer_get_layer(s_date_layer), &start, &end, 1000, 58000);
     }
-  } else if(seconds == 0) {
+  }
+  if(minutes == 0) {
     if((hours % 2) == 1) {
       //Slides on to the left at the bottom starting from the right
       GRect start = GRect(288, 110, 139, 50);
       GRect end = GRect(5, 110, 139, 50);
-      animate_layer(text_layer_get_layer(s_date_layer), &start, &end, 1000, 300);
+      animate_layer(text_layer_get_layer(s_date_layer), &start, &end, 1000, 0);
     }
     else {
       //Slides on to the right starting from left
       GRect start = GRect(-144, 0, 139, 50);
       GRect end = GRect(5, 0, 139, 50);
-      animate_layer(text_layer_get_layer(s_date_layer), &start, &end, 1000, 300);
+      animate_layer(text_layer_get_layer(s_date_layer), &start, &end, 1000, 0);
     }
   }
   
