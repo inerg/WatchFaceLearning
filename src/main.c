@@ -8,48 +8,6 @@ static BitmapLayer  *s_background_layer;
 static GBitmap  *s_background_bitmap;
 
 
-static void update_time()  {
-  //Gets the tm structure
-  time_t temp = time(NULL);
-  struct tm *tick_time = localtime(&temp);
-  
-  int seconds = tick_time->tm_sec;
-  int minutes = tick_time->tm_min;
-  int hours = tick_time->tm_hour;
-  
-  if(minutes == 59) {
-    //Sets the ticker to seconds for the last minute for the transition to happen at the last second
-      //tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
-    if(seconds == 59) {  
-      if((hours % 2) == 1) {
-        //Slides off to the left at the bottom
-        //GRect
-      }
-      else {
-        
-      }
-    }
-  }
-  //Create a buffer for time
-  static char time_buffer[] = "00:00";
-  
-  //Create a buffer for the date
-  static char date_buffer[] = "jan01";
-  
-  //Insert the current hour and minutes into the buffer
-  if(clock_is_24h_style()==true)  {
-    //Use 24 hour format
-    strftime(time_buffer, sizeof("00:00"), "%H:%M", tick_time);
-  }  else {
-    //Use 12 hour format
-    strftime(time_buffer, sizeof("00:00"), "%I:%M", tick_time);
-  }
-  strftime(date_buffer, sizeof"jan01", "%h%d", tick_time);
-  
-  //Put this time into the text layer
-  text_layer_set_text(s_time_layer, time_buffer);
-  text_layer_set_text(s_date_layer, date_buffer);
-}
 
 static void main_window_load(Window *window)  {
   //Create Gbitmap and then set it as the base BitmapLayer for the window
@@ -80,7 +38,7 @@ static void main_window_load(Window *window)  {
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_time_layer));
   
   //DATE LAYER
-  s_date_layer = text_layer_create(GRect(5, 110, 139, 50));
+  s_date_layer = text_layer_create(GRect(5, 0, 139, 50));
   text_layer_set_background_color(s_date_layer, GColorClear);
   text_layer_set_text_color(s_date_layer, GColorWhite);
   text_layer_set_text(s_date_layer, "jan 01");
@@ -128,6 +86,69 @@ void animate_layer(Layer *layer, GRect *start, GRect *finish, int duration, int 
   
   //Start animation
   animation_schedule((Animation*) anim);
+}
+
+static void update_time()  {
+  //Gets the tm structure
+  time_t temp = time(NULL);
+  struct tm *tick_time = localtime(&temp);
+  
+  //Create a buffer for time
+  static char time_buffer[] = "00:00";
+  
+  //Create a buffer for the date
+  static char date_buffer[] = "jan01";
+  
+  //Insert the current hour and minutes into the buffer
+  if(clock_is_24h_style()==true)  {
+    //Use 24 hour format
+    strftime(time_buffer, sizeof("00:00"), "%H:%M", tick_time);
+  }  else {
+    //Use 12 hour format
+    strftime(time_buffer, sizeof("00:00"), "%I:%M", tick_time);
+  }
+  strftime(date_buffer, sizeof"jan01", "%h%d", tick_time);
+  
+  int seconds = tick_time->tm_sec;
+  int minutes = tick_time->tm_min;
+  int hours = tick_time->tm_hour;
+  
+  if(minutes == 59) {
+    //Sets the ticker to seconds for the last minute for the transition to happen at the last second 
+      //tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
+
+    if((hours % 2) == 1) {
+      //Slides off to the left at the bottom
+      GRect start = GRect(5, 110, 139, 50);
+      GRect end = GRect(-149, 110, 139, 50);
+      animate_layer(text_layer_get_layer(s_date_layer), &start, &end, 1000, 300);
+    }
+    else {
+      //Slides off to the right
+      GRect start = GRect(5, 0, 139, 50);
+      GRect end = GRect(144, 0, 139, 50);
+      animate_layer(text_layer_get_layer(s_date_layer), &start, &end, 1000, 300);
+    }
+  } else if(seconds == 0) {
+    if((hours % 2) == 1) {
+      //Slides on to the left at the bottom starting from the right
+      GRect start = GRect(288, 110, 139, 50);
+      GRect end = GRect(5, 110, 139, 50);
+      animate_layer(text_layer_get_layer(s_date_layer), &start, &end, 1000, 300);
+    }
+    else {
+      //Slides on to the right starting from left
+      GRect start = GRect(-144, 0, 139, 50);
+      GRect end = GRect(5, 0, 139, 50);
+      animate_layer(text_layer_get_layer(s_date_layer), &start, &end, 1000, 300);
+    }
+  }
+  
+
+  
+  //Put this time into the text layer
+  text_layer_set_text(s_time_layer, time_buffer);
+  text_layer_set_text(s_date_layer, date_buffer);
 }
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed)  {
