@@ -9,6 +9,16 @@
     "resources": {
         "media": [
             {
+                "file": "images/connection-broken.png",
+                "name": "BT_DISCONNECTED",
+                "type": "png"
+            },
+            {
+                "file": "images/connection-working.png",
+                "name": "BT_CONNECTED",
+                "type": "png"
+            },
+            {
                 "file": "images/battery-empty.png",
                 "name": "BATTERY_0",
                 "type": "png"
