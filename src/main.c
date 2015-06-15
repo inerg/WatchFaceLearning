@@ -6,7 +6,9 @@ static TextLayer  *s_date_layer;
 static GFont s_time_font;
 static BitmapLayer  *s_background_layer;
 static BitmapLayer *s_battery_layer;
-static GBitmap *s_battery_bitmap; //Might need more of these for each image.
+static BitmapLayer *s_bt_connection_layer;
+static GBitmap *s_battery_bitmap;
+static GBitmap *s_bt_connection_bitmap;
 static GBitmap  *s_background_bitmap;
 
 static void main_window_load(Window *window)  {
@@ -57,6 +59,12 @@ static void main_window_load(Window *window)  {
   s_battery_layer = bitmap_layer_create(GRect(4, 49, 139, 16));
   bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
   layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(s_battery_layer));
+  
+  //BT CONNECTION LAYER
+  s_bt_connection_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BT_CONNECTED);
+  s_bt_connection_layer = bitmap_layer_create(GRect(3, 104, 139, 16));//Need to figure this out
+  bitmap_layer_set_bitmap(s_bt_connection_layer, s_bt_connection_bitmap);
+  layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(s_bt_connection_layer));
 }
 
 static void main_window_unload(Window *window)  {
@@ -73,6 +81,10 @@ static void main_window_unload(Window *window)  {
   //Destroys bitmap for battery
   gbitmap_destroy(s_battery_bitmap);
   //Destroys bitmap layer for battery
+  bitmap_layer_destroy(s_battery_layer);
+  //Destroys bitmap for connection
+  gbitmap_destroy(s_battery_bitmap);
+  //Destroys bitmap layer for connection
   bitmap_layer_destroy(s_battery_layer);
 }
 
@@ -96,6 +108,39 @@ void animate_layer(Layer *layer, GRect *start, GRect *finish, int duration, int 
   
   //Start animation
   animation_schedule((Animation*) anim);
+}
+
+
+static void tick_handler(struct tm *tick_time, TimeUnits units_changed)  {
+  update_time();
+}
+
+static void update_battery()  {
+  BatteryChargeState battery_state = battery_state_service_peek();
+  if(battery_state.charge_percent > 90)  {
+    s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_100);
+    bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
+  } else if(battery_state.charge_percent > 80)  {
+    s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_80);
+    bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
+  } else if(battery_state.charge_percent > 60)  {
+    s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_60);
+    bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
+  } else if(battery_state.charge_percent > 40)  {
+    s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_40);
+    bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
+  } else if(battery_state.charge_percent > 20)  {
+    s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_20);
+    bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
+  } else if(battery_state.charge_percent < 20)  {
+    s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_0);
+    bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
+  }
+  
+}
+
+static void battery_handler(BatteryChargeState charge_state)  {
+  update_battery();
 }
 
 static void update_time()  {
@@ -159,36 +204,16 @@ static void update_time()  {
   text_layer_set_text(s_date_layer, date_buffer);
 }
 
-static void tick_handler(struct tm *tick_time, TimeUnits units_changed)  {
-  update_time();
-}
 
-static void update_battery()  {
-  BatteryChargeState battery_state = battery_state_service_peek();
-  if(battery_state.charge_percent > 90)  {
-    s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_100);
-    bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
-  } else if(battery_state.charge_percent > 80)  {
-    s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_80);
-    bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
-  } else if(battery_state.charge_percent > 60)  {
-    s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_60);
-    bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
-  } else if(battery_state.charge_percent > 40)  {
-    s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_40);
-    bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
-  } else if(battery_state.charge_percent > 20)  {
-    s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_20);
-    bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
-  } else if(battery_state.charge_percent < 20)  {
-    s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_0);
-    bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
+static void bluetooth_handler(bool connected)  {
+  if(connected)  {
+    s_bt_connection_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BT_CONNECTED);
+    bitmap_layer_set_bitmap(s_bt_connection_layer, s_bt_connection_bitmap);
+    
+  } else  {
+    s_bt_connection_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BT_DISCONNECTED);
+    bitmap_layer_set_bitmap(s_bt_connection_layer, s_bt_connection_bitmap);
   }
-  
-}
-
-static void battery_handler(BatteryChargeState charge_state)  {
-  update_battery();
 }
 
 //Used only for startup to ensure the date is placed properly
@@ -254,6 +279,9 @@ static void init()  {
   update_battery();
   //Registering the BatteryStateService
   battery_state_service_subscribe(battery_handler);
+  
+  //Registering the BluethoothConnectionService
+  bluetooth_connection_service_subscribe(bluetooth_handler);
 }
 
 static void deinit()  {
