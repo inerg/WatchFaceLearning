@@ -131,24 +131,22 @@ static void update_time()  {
   }
   strftime(date_buffer, sizeof"jan01", "%h%d", tick_time);
   
+  int seconds = tick_time->tm_sec;
   int minutes = tick_time->tm_min;
   int hours = tick_time->tm_hour;
   //Checks the date position to ensure its placed correctly
-  if(minutes == 59) {
-    //Sets the ticker to seconds for the last minute for the transition to happen at the last second 
-      //tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
-
+  if(seconds == 58) {
     if((hours % 2) == 1) {
       //Slides off to the left at the bottom
       GRect start = GRect(5, 110, 139, 50);
       GRect end = GRect(-149, 110, 139, 50);
-      animate_layer(text_layer_get_layer(s_date_layer), &start, &end, 1000, 58000);
+      animate_layer(text_layer_get_layer(s_date_layer), &start, &end, 1000, 0);
     }
     else {
       //Slides off to the right
       GRect start = GRect(5, 0, 139, 50);
       GRect end = GRect(144, 0, 139, 50);
-      animate_layer(text_layer_get_layer(s_date_layer), &start, &end, 1000, 58000);
+      animate_layer(text_layer_get_layer(s_date_layer), &start, &end, 1000, 0);
     }
   } else if(minutes == 0) {
     if((hours % 2) == 1) {
@@ -171,11 +169,27 @@ static void update_time()  {
   text_layer_set_text(s_date_layer, date_buffer);
 }
 
+void subscription_check();
+
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed)  {
   update_time();
+  subscription_check();
 }
 
-
+void subscription_check()  {
+    
+  //Gets the tm structure
+  time_t temp = time(NULL);
+  struct tm *tick_time = localtime(&temp);
+  
+  int seconds = tick_time->tm_sec;
+  int minutes = tick_time->tm_min;
+  //Sets tick time to properly check when the hour changes so animimations happen on time
+  if(minutes == 59) {
+    tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
+  } else if(seconds == 0)
+    tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
+}
 
 
 static void update_battery()  {
@@ -297,3 +311,4 @@ int main(void)  {
   app_event_loop();
   deinit();
 }
+
