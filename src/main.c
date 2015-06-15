@@ -172,8 +172,8 @@ static void update_time()  {
 void subscription_check();
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed)  {
-  update_time();
   subscription_check();
+  update_time();
 }
 
 void subscription_check()  {
