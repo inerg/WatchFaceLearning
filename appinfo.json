@@ -9,6 +9,36 @@
     "resources": {
         "media": [
             {
+                "file": "images/battery-empty-charging.png",
+                "name": "BATTERY_0_CHARGING",
+                "type": "png"
+            },
+            {
+                "file": "images/battery-charged-charging.png",
+                "name": "BATTERY_90_CHARGING",
+                "type": "png"
+            },
+            {
+                "file": "images/battery-80-charging.png",
+                "name": "BATTERY_80_CHARGING",
+                "type": "png"
+            },
+            {
+                "file": "images/battery-60-charging.png",
+                "name": "BATTERY_60_CHARGING",
+                "type": "png"
+            },
+            {
+                "file": "images/battery-40-charging.png",
+                "name": "BATTERY_40_CHARGING",
+                "type": "png"
+            },
+            {
+                "file": "images/battery-20-charging.png",
+                "name": "BATTERY_20_CHARGING",
+                "type": "png"
+            },
+            {
                 "file": "images/connection-broken.png",
                 "name": "BT_DISCONNECTED",
                 "type": "png"

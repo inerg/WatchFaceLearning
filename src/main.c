@@ -194,26 +194,46 @@ void subscription_check()  {
 
 static void update_battery()  {
   BatteryChargeState battery_state = battery_state_service_peek();
-  if(battery_state.charge_percent > 90)  {
-    s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_100);
-    bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
-  } else if(battery_state.charge_percent > 80)  {
-    s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_80);
-    bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
-  } else if(battery_state.charge_percent > 60)  {
-    s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_60);
-    bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
-  } else if(battery_state.charge_percent > 40)  {
-    s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_40);
-    bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
-  } else if(battery_state.charge_percent > 20)  {
-    s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_20);
-    bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
-  } else if(battery_state.charge_percent < 20)  {
-    s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_0);
-    bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
-  }
-  
+  if(battery_state.is_charging)  {
+    
+    if(battery_state.charge_percent > 90)  {
+      s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_90_CHARGING);
+      bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
+    } else if(battery_state.charge_percent > 80)  {
+      s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_80_CHARGING);
+      bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
+    } else if(battery_state.charge_percent > 60)  {
+      s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_60_CHARGING);
+      bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
+    } else if(battery_state.charge_percent > 40)  {
+      s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_40_CHARGING);
+      bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
+    } else if(battery_state.charge_percent > 20)  {
+      s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_20_CHARGING);
+      bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
+    } else if(battery_state.charge_percent < 20)  {
+      s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_0_CHARGING);
+      bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
+    }
+  } else if(battery_state.charge_percent > 90)  {
+      s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_100);
+      bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
+    } else if(battery_state.charge_percent > 80)  {
+      s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_80);
+      bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
+    } else if(battery_state.charge_percent > 60)  {
+      s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_60);
+      bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
+    } else if(battery_state.charge_percent > 40)  {
+      s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_40);
+      bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
+    } else if(battery_state.charge_percent > 20)  {
+      s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_20);
+      bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
+    } else if(battery_state.charge_percent < 20)  {
+      s_battery_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BATTERY_0);
+      bitmap_layer_set_bitmap(s_battery_layer, s_battery_bitmap);
+    }
 }
 
 static void battery_handler(BatteryChargeState charge_state)  {
