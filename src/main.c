@@ -226,10 +226,12 @@ static void bluetooth_handler(bool connected)  {
   if(connected)  {
     s_bt_connection_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BT_CONNECTED);
     bitmap_layer_set_bitmap(s_bt_connection_layer, s_bt_connection_bitmap);
-    
+    vibes_double_pulse();
   } else  {
     s_bt_connection_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BT_DISCONNECTED);
     bitmap_layer_set_bitmap(s_bt_connection_layer, s_bt_connection_bitmap);
+    vibes_short_pulse();
+    vibes_long_pulse();
   }
 }
 
